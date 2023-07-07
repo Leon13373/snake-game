@@ -1,0 +1,112 @@
+```python
+import pygame
+import time
+
+pygame.init()
+
+# Определение цветов
+BLACK = (0, 0, 0)
+GREEN = (0, 255, 0)
+RED = (255, 0, 0)
+
+# Размеры окна
+window_width = 800
+window_height = 600
+
+# Размер ячейки змейки
+cell_size = 20
+
+# Инициализация окна
+window = pygame.display.set_mode((window_width, window_height))
+pygame.display.set_caption('Змейка')
+
+clock = pygame.time.Clock()
+
+def draw_snake(snake):
+    for segment in snake:
+        pygame.draw.rect(window, GREEN, (segment[0], segment[1], cell_size, cell_size))
+
+def game_loop():
+    game_over = False
+    game_quit = False
+
+    # Позиция и скорость змейки
+    x = window_width / 2
+    y = window_height / 2
+    x_speed = 0
+    y_speed = 0
+
+    snake = []
+    snake_length = 1
+
+    # Главный игровой цикл
+    while not game_quit:
+        while game_over == True:
+            window.fill(BLACK)
+            font = pygame.font.Font(None, 36)
+            text = font.render("Игра окончена! Нажмите пробел, чтобы сыграть еще раз", True, RED)
+            window.blit(text, [window_width/2 - text.get_width()/2, window_height/2 - text.get_height()/2])
+            pygame.display.flip()
+
+            for event in pygame.event.get():
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_SPACE:
+                        game_loop()
+
+                if event.type == pygame.QUIT:
+                    game_quit = True
+                    game_over = False
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                game_quit = True
+
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_LEFT:
+                    x_speed = -cell_size
+                    y_speed = 0
+                elif event.key == pygame.K_RIGHT:
+                    x_speed = cell_size
+                    y_speed = 0
+                elif event.key == pygame.K_UP:
+                    y_speed = -cell_size
+                    x_speed = 0
+                elif event.key == pygame.K_DOWN:
+                    y_speed = cell_size
+                    x_speed = 0
+
+        # Обновление позиции змейки
+        x += x_speed
+        y += y_speed
+
+        # Проверка столкновения с границами окна
+        if x < 0 or x >= window_width or y < 0 or y >= window_height:
+            game_over = True
+
+        snake_head = []
+        snake_head.append(x)
+        snake_head.append(y)
+        snake.append(snake_head)
+
+        if len(snake) > snake_length:
+            del snake[0]
+
+        # Проверка столкновения с самой собой
+        if snake_head in snake[:-1]:
+            game_over = True
+
+        window.fill(BLACK)
+        draw_snake(snake)
+        pygame.display.update()
+
+        # Установка скорости обновления экрана
+        clock.tick(10)
+
+    # Завершение Pygame
+    pygame.quit()
+
+# Запуск игры
+game_loop()
+```
+
+Этот код создает простую игру в змейку, в которой вы управляете змейкой, используя клавиши со стрелками. Змейка растет по мере того, как ест "еду". Если змейка сталкивается с границей окна или сама с собой, игра заканчивается. Чтобы сыграть еще раз, нажмите пробел.
